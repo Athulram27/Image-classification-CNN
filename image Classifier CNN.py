@@ -93,7 +93,7 @@ loss_function = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr = 0.001, momentum = 0.9)
 
 
-# In[ ]:
+# In[36]:
 
 
 for epoch in range(30):
@@ -118,20 +118,20 @@ for epoch in range(30):
         
 
 
-# In[ ]:
+# In[39]:
 
 
-torch,save(net.state_dict(),'trained_net.pth')
+torch.save(net.state_dict(),'trained_net.pth')
 
 
-# In[ ]:
+# In[40]:
 
 
 net = NeuralNet()
 net.load_state_dict(torch.load('trained_net.pth'))
 
 
-# In[ ]:
+# In[42]:
 
 
 correct = 0
@@ -145,7 +145,7 @@ with torch.no_grad():
         outputs = net(images)
         _, predicted = torch.max(outputs,1)
         total += labels.size(0)
-        correct += (predicted == labels).sum().items()
+        correct += (predicted == labels).sum().item()
 
 accuracy = 100* correct/ total
 
@@ -155,27 +155,35 @@ print(f'Accuracy: {accuracy}%')
     
 
 
-# In[ ]:
+# In[46]:
 
 
-new_transform = transform.Compose([
+new_transform = transforms.Compose([
     transforms.Resize((32, 32)),
     transforms.ToTensor(),
-    transforms.Normalize((0.5,0.5,0.5),(0.50,0.5,0.5))
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
 def load_image(image_path):
-    image  = image.open(image_path)
+    image = Image.open(image_path)
     image = new_transform(image)
     image = image.unsqueeze(0)
+    return image
 
-    image_paths = ['example1.jpg', 'example2.jpg']
-    images = [load_image(img) fro img in image_paths]
-    
-    net.eval()
-    with torch.no_grad():
-        for image in images:
-            output = net(image)
-            _, predicted = torch.max(output,1)
-            print(f'Prediction: {class_names[predicted.item()]}')
+image_paths = ['example1.jpg', 'example2.jpg']
+
+images = [load_image(img) for img in image_paths]
+
+net.eval()
+with torch.no_grad():
+    for image in images:
+        output = net(image) 
+        _, predicted = torch.max(output, 1)
+        print(f'Prediction: {class_names[predicted.item()]}')
+
+
+# In[ ]:
+
+
+
 
